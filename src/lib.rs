@@ -14,7 +14,7 @@ use dotenv::dotenv;
 use rocket::{Request, Rocket};
 pub mod cats;
 mod mongo_connection;
-
+mod static_files;
 #[catch(500)]
 fn internal_error() -> &'static str {
     "Whoops! Looks like we messed up."
@@ -31,14 +31,18 @@ pub fn rocket() -> Rocket {
         .register(catchers![internal_error, not_found])
         .manage(mongo_connection::init_pool())
         .mount(
-            "/cats",
+            "/api/v1",
             routes![
                 cats::handler::all,
                 cats::handler::get,
                 cats::handler::post,
                 cats::handler::put,
                 cats::handler::delete,
-                cats::handler::delete_all
+                cats::handler::delete_all,
+                static_files::all,
+                static_files::index,
+                static_files::login,
+                static_files::callback
             ],
         )
 }
