@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 dotenv = "0.13.0"
 r2d2 = "0.8.3"
-r2d2-mongodb = "*"
+diesel = { version = "1.2.2", features = ["postgres"] }
 rocket = "0.4"
 rocket_codegen = "0.4"
 serde = { version = "1", features = ["derive"] }
@@ -23,14 +23,14 @@ http = "0.2.1"
 tokio = { version = "0.2.4", features = ["full"] }
 async-std = { version = "1.2.0", features = ["attributes"] }
 base64-url = "1.2.0"
-
+futures = "0.3.5"
 # Benches
 criterion = "0.3"
 
 [dependencies.mongodb]
 version = "0.11.0"
 default-features = false
-features = ["async-std-runtime"]
+features = ["sync"]
 
 [dependencies.rocket_contrib]
 default-features = false

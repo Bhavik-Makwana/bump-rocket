@@ -4,11 +4,13 @@ extern crate rocket;
 extern crate dotenv;
 extern crate mongodb;
 extern crate r2d2;
-extern crate r2d2_mongodb;
+#[macro use]
+extern crate diesel;
 extern crate rocket_contrib;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
+
 
 use dotenv::dotenv;
 use rocket::{Request, Rocket};
@@ -27,22 +29,26 @@ fn not_found(req: &Request) -> String {
 
 pub fn rocket() -> Rocket {
     dotenv().ok();
+    
     rocket::ignite()
         .register(catchers![internal_error, not_found])
-        .manage(mongo_connection::init_pool())
+        .manage(mongo_connection::init_pool(data))
         .mount(
             "/api/v1",
             routes![
                 cats::handler::all,
-                cats::handler::get,
-                cats::handler::post,
-                cats::handler::put,
-                cats::handler::delete,
-                cats::handler::delete_all,
-                static_files::all,
-                static_files::index,
-                static_files::login,
-                static_files::callback
+                // cats::handler::get,
+                // cats::handler::post,
+                // cats::handler::put,
+                // cats::handler::delete,
+                // cats::handler::delete_all,
             ],
+        )
+        .mount( 
+            "/",
+            routes![static_files::all,
+            static_files::index,
+            static_files::login,
+            static_files::callback],
         )
 }

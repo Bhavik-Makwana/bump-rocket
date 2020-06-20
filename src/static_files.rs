@@ -19,8 +19,8 @@ extern crate base64_url;
 extern crate reqwest;
 extern crate serde;
 // use reqwest::Client;
-use serde::Deserialize;
-use mongodb::{Client, options::ClientOptions};
+// use serde::Deserialize;
+// use mongodb::{Client, options::ClientOptions};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Token {
@@ -112,6 +112,6 @@ async fn auth_token_request(map: HashMap<&str, &str>, header: String) -> Result<
         .json()
         .await?;
 
-    let client = mongodb::Client::with_uri_str("mongodb://localhost:27017/").await?;
+    // let client = mongodb::Client::with_uri_str("mongodb://localhost:27017/").await?;
     Ok(res)
 }

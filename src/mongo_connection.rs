@@ -1,6 +1,6 @@
 use dotenv::dotenv;
 use r2d2::PooledConnection;
-use r2d2_mongodb::{ConnectionOptions, MongodbConnectionManager};
+use crate::r2d2_mongodb::{ConnectionOptions, MongodbConnectionManager};
 use rocket::http::Status;
 use rocket::request::{self, FromRequest};
 use rocket::{Outcome, Request, State};
