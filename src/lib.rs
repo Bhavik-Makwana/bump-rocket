@@ -1,49 +1,41 @@
-#![feature(decl_macro, proc_macro_hygiene)]
+#![feature(plugin, const_fn, decl_macro, proc_macro_hygiene)]
+#![allow(proc_macro_derive_resolution_fallback, unused_attributes)]
+
+#[macro_use]
+extern crate diesel;
+
+extern crate dotenv;
+extern crate r2d2;
+extern crate r2d2_diesel;
 #[macro_use]
 extern crate rocket;
-extern crate dotenv;
-extern crate mongodb;
-extern crate r2d2;
-#[macro use]
-extern crate diesel;
 extern crate rocket_contrib;
 #[macro_use]
 extern crate serde_derive;
+#[macro_use]
 extern crate serde_json;
 
-
 use dotenv::dotenv;
-use rocket::{Request, Rocket};
-pub mod cats;
-mod mongo_connection;
+use std::env;
+use routes::*;
+
+mod db;
+mod models;
+mod routes;
+mod schema;
 mod static_files;
-#[catch(500)]
-fn internal_error() -> &'static str {
-    "Whoops! Looks like we messed up."
-}
 
-#[catch(400)]
-fn not_found(req: &Request) -> String {
-    format!("I couldn't find '{}'. Try something else?", req.uri())
-}
 
-pub fn rocket() -> Rocket {
+pub fn rocket() -> rocket::Rocket {
     dotenv().ok();
     
     rocket::ignite()
-        .register(catchers![internal_error, not_found])
-        .manage(mongo_connection::init_pool(data))
+        .manage(db::init_pool())
         .mount(
             "/api/v1",
-            routes![
-                cats::handler::all,
-                // cats::handler::get,
-                // cats::handler::post,
-                // cats::handler::put,
-                // cats::handler::delete,
-                // cats::handler::delete_all,
-            ],
+            routes![index, new, show, delete, author, update],
         )
+        
         .mount( 
             "/",
             routes![static_files::all,

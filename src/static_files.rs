@@ -1,3 +1,5 @@
+extern crate rand;
+
 use std::io;
 use std::path::{Path, PathBuf};
 use rocket::response::NamedFile;
@@ -14,7 +16,7 @@ use std::collections::HashMap;
 // use hyper::header::{Headers, Authorization};
 use tokio;
 
-extern crate mongodb;
+// extern crate mongodb;
 extern crate base64_url;
 extern crate reqwest;
 extern crate serde;
