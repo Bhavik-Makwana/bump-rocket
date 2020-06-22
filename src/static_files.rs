@@ -20,7 +20,10 @@ extern crate reqwest;
 extern crate serde;
 // use reqwest::Client;
 use serde::Deserialize;
-use mongodb::{Client, options::ClientOptions};
+
+use mongodb::{Bson, bson, doc};
+use mongodb::{Client, ThreadedClient};
+use mongodb::db::ThreadedDatabase;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Token {
@@ -93,16 +96,29 @@ pub fn callback(code: String, state: String, cookies: Cookies) {
     let encoded = base64_url::encode(&secret);
     authcode.push_str(&encoded);
     // println!("{}", authcode);
-    // println!("calling funcition");
+    println!("calling funcition");
     let res = auth_token_request(map, authcode).unwrap();
+
+    let client = Client::connect("localhost", 27017)
+    .expect("Failed to initialize standalone client.");
+    let coll = client.db("test").collection("users");
+    let doc = doc! {
+        "name": "Jaws",
+        "access_token": res.access_token,
+        "token_type": res.token_type,
+        "scope": res.scope,
+        "expires_in": res.expires_in,
+        "refresh_token": res.refresh_token,
+    };
+
+    coll.insert_one(doc.clone(), None).ok().expect("Failed to insert doc.");
     
-    println!{"{:#?}", res};
-    // println!("function called");
+    println!("function called");
 
 }
 
 #[tokio::main]
-async fn auth_token_request(map: HashMap<&str, &str>, header: String) -> Result<Token, reqwest::Error>{
+async fn auth_token_request(map: HashMap<&str, &str>, header: String) -> Result<Token, reqwest::Error> {
     let res: Token = reqwest::Client::new()
         .post("https://accounts.spotify.com/api/token")
         .header("Authorization", header)
@@ -111,7 +127,7 @@ async fn auth_token_request(map: HashMap<&str, &str>, header: String) -> Result<
         .await?
         .json()
         .await?;
-
-    let client = mongodb::Client::with_uri_str("mongodb://localhost:27017/").await?;
+    
+    // let client = mongodb::Client::with_uri_str("mongodb://localhost:27017/").await?;
     Ok(res)
 }
